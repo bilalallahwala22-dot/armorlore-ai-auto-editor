@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArmorLore AI Auto Editor</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111827;
+  color: #f9fafb;
+}
+
+header {
+  padding: 20px;
+  background: #1f2937;
+  border-bottom: 2px solid #b58b45;
+}
+
+h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+header p {
+  color: #d1d5db;
+  margin-bottom: 0;
+}
+
+main {
+  max-width: 1000px;
+  margin: auto;
+  padding: 16px;
+}
+
+.panel {
+  background: #1f2937;
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+h2 {
+  font-size: 19px;
+  margin-top: 0;
+}
+
+button, .upload-button {
+  background: #b58b45;
+  color: #111827;
+  border: none;
+  padding: 11px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  display: inline-block;
+  margin: 4px 3px 4px 0;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+input[type="file"] {
+  display: block;
+  margin: 12px 0;
+  max-width: 100%;
+}
+
+input, button {
+  font-size: 14px;
+}
+
+.item {
+  background: #374151;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+
+.item img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 180px;
+  margin: 10px 0;
+  object-fit: contain;
+}
+
+.item button {
+  padding: 8px 12px;
+}
+
+#preview {
+  max-width: 100%;
+  max-height: 400px;
+  display: block;
+  margin: 12px auto;
+}
+
+#status {
+  color: #fcd34d;
+  overflow-wrap: anywhere;
+}
+
+.small {
+  color: #d1d5db;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+footer {
+  padding: 20px;
+  text-align: center;
+  color: #9ca3af;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>ArmorLore AI Auto Editor</h1>
+  <p>Your personal browser-based video workspace</p>
+</header>
+
+<main>
+
+  <section class="panel">
+    <h2>1. Upload Voice-over Files</h2>
+    <p class="small">
+      Select multiple audio files from your device.
+      Files will appear in the order you add them.
+    </p>
+
+    <input
+      id="audioInput"
+      type="file"
+      accept="audio/*"
+      multiple
+    >
+
+    <div id="audioList"></div>
+    <audio id="audioPlayer" controls style="width:100%"></audio>
+  </section>
+
+  <section class="panel">
+    <h2>2. Add Your Original Images</h2>
+    <p class="small">
+      Select your own images. This tool displays the selected
+      originals without generating or replacing them.
+    </p>
+
+    <input
+      id="imageInput"
+      type="file"
+      accept="image/*"
+      multiple
+    >
+
+    <div id="imageList"></div>
+  </section>
+
+  <section class="panel">
+    <h2>3. Image Preview</h2>
+    <p class="small">
+      Choose Preview on any image to view it here.
+    </p>
+
+    <img id="preview" alt="Selected image preview" hidden>
+    <p id="previewMessage">No image selected yet.</p>
+  </section>
+
+  <section class="panel">
+    <h2>4. Project Status</h2>
+    <p id="status">Editor loaded. No files selected yet.</p>
+
+    <p class="small">
+      Current version: file selection, audio playback,
+      image preview and manual image ordering.
+      Automatic narration synchronization and MP4 export
+      are not implemented in this version.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  ArmorLore AI Auto Editor — First Test Version
+</footer>
+
+<script>
+"use strict";
+
+const audioInput = document.getElementById("audioInput");
+const imageInput = document.getElementById("imageInput");
+const audioList = document.getElementById("audioList");
+const imageList = document.getElementById("imageList");
+const audioPlayer = document.getElementById("audioPlayer");
+const preview = document.getElementById("preview");
+const previewMessage = document.getElementById("previewMessage");
+const status = document.getElementById("status");
+
+let audioFiles = [];
+let imageFiles = [];
+let currentAudioUrl = null;
+let currentPreviewUrl = null;
+
+function makeButton(label, action, disabled = false) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = label;
+  button.disabled = disabled;
+  button.addEventListener("click", action);
+  return button;
+}
+
+function updateStatus() {
+  status.textContent =
+    "Audio files: " + audioFiles.length +
+    " | Image files: " + imageFiles.length +
+    " | Original files remain unchanged on your device.";
+}
+
+audioInput.addEventListener("change", () => {
+  const selected = Array.from(audioInput.files || []);
+
+  for (const file of selected) {
+    if (file.type.startsWith("audio/")) {
+      audioFiles.push(file);
+    }
+  }
+
+  renderAudio();
+  updateStatus();
+
+  // Allow selecting the same file again if needed.
+  audioInput.value = "";
+});
+
+imageInput.addEventListener("change", () => {
+  const selected = Array.from(imageInput.files || []);
+
+  for (const file of selected) {
+    if (file.type.startsWith("image/")) {
+      imageFiles.push(file);
+    }
+  }
+
+  renderImages();
+  updateStatus();
+
+  imageInput.value = "";
+});
+
+function renderAudio() {
+  audioList.replaceChildren();
+
+  if (audioFiles.length === 0) {
+    const message = document.createElement("p");
+    message.textContent = "No audio files added.";
+    audioList.appendChild(message);
+    return;
+  }
+
+  audioFiles.forEach((file, index) => {
+    const item = document.createElement("div");
+    item.className = "item";
+
+    const name = document.createElement("div");
+    name.textContent = (index + 1) + ". " + file.name;
+    item.appendChild(name);
+
+    const size = document.createElement("p");
+    size.className = "small";
+    size.textContent =
+      (file.size / (1024 * 1024)).toFixed(2) + " MB";
+    item.appendChild(size);
+
+    item.appendChild(makeButton("Play", () => {
+      if (currentAudioUrl) {
+        URL.revokeObjectURL(currentAudioUrl);
+      }
+
+      currentAudioUrl = URL.createObjectURL(file);
+      audioPlayer.src = currentAudioUrl;
+      audioPlayer.play().catch(() => {
+        status.textContent =
+          "Audio selected. Press Play on the audio player.";
+      });
+    }));
+
+    item.appendChild(makeButton(
+      "Move Up",
+      () => {
+        if (index > 0) {
+          [audioFiles[index - 1], audioFiles[index]] =
+            [audioFiles[index], audioFiles[index - 1]];
+          renderAudio();
+        }
+      },
+      index === 0
+    ));
+
+    item.appendChild(makeButton(
+      "Move Down",
+      () => {
+        if (index < audioFiles.length - 1) {
+          [audioFiles[index + 1], audioFiles[index]] =
+            [audioFiles[index], audioFiles[index + 1]];
+          renderAudio();
+        }
+      },
+      index === audioFiles.length - 1
+    ));
+
+    item.appendChild(makeButton("Remove", () => {
+      audioFiles.splice(index, 1);
+      renderAudio();
+      updateStatus();
+    }));
+
+    audioList.appendChild(item);
+  });
+}
+
+function renderImages() {
+  imageList.replaceChildren();
+
+  if (imageFiles.length === 0) {
+    const message = document.createElement("p");
+    message.textContent = "No images added.";
+    imageList.appendChild(message);
+    return;
+  }
+
+  imageFiles.forEach((file, index) => {
+    const item = document.createElement("div");
+    item.className = "item";
+
+    const name = document.createElement("div");
+    name.textContent = (index + 1) + ". " + file.name;
+    item.appendChild(name);
+
+    const size = document.createElement("p");
+    size.className = "small";
+    size.textContent =
+      (file.size / (1024 * 1024)).toFixed(2) + " MB";
+    item.appendChild(size);
+
+    item.appendChild(makeButton("Preview", () => {
+      if (currentPreviewUrl) {
+        URL.revokeObjectURL(currentPreviewUrl);
+      }
+
+      currentPreviewUrl = URL.createObjectURL(file);
+      preview.src = currentPreviewUrl;
+      preview.hidden = false;
+      previewMessage.textContent = file.name;
+    }));
+
+    item.appendChild(makeButton(
+      "Move Up",
+      () => {
+        if (index > 0) {
+          [imageFiles[index - 1], imageFiles[index]] =
+            [imageFiles[index], imageFiles[index - 1]];
+          renderImages();
+        }
+      },
+      index === 0
+    ));
+
+    item.appendChild(makeButton(
+      "Move Down",
+      () => {
+        if (index < imageFiles.length - 1) {
+          [imageFiles[index + 1], imageFiles[index]] =
+            [imageFiles[index], imageFiles[index + 1]];
+          renderImages();
+        }
+      },
+      index === imageFiles.length - 1
+    ));
+
+    item.appendChild(makeButton("Remove", () => {
+      imageFiles.splice(index, 1);
+      renderImages();
+      updateStatus();
+    }));
+
+    imageList.appendChild(item);
+  });
+}
+
+window.addEventListener("beforeunload", () => {
+  if (currentAudioUrl) URL.revokeObjectURL(currentAudioUrl);
+  if (currentPreviewUrl) URL.revokeObjectURL(currentPreviewUrl);
+});
+
+renderAudio();
+renderImages();
+updateStatus();
+</script>
+
+</body>
+</html>
