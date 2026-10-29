@@ -1,415 +1,455 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ArmorLore AI Auto Editor</title>
-
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #111827;
-  color: #f9fafb;
-}
-
-header {
-  padding: 20px;
-  background: #1f2937;
-  border-bottom: 2px solid #b58b45;
-}
-
-h1 {
-  margin: 0;
-  font-size: 24px;
-}
-
-header p {
-  color: #d1d5db;
-  margin-bottom: 0;
-}
-
-main {
-  max-width: 1000px;
-  margin: auto;
-  padding: 16px;
-}
-
-.panel {
-  background: #1f2937;
-  border-radius: 10px;
-  padding: 18px;
-  margin-bottom: 18px;
-}
-
-h2 {
-  font-size: 19px;
-  margin-top: 0;
-}
-
-button, .upload-button {
-  background: #b58b45;
-  color: #111827;
-  border: none;
-  padding: 11px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  display: inline-block;
-  margin: 4px 3px 4px 0;
-}
-
-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-input[type="file"] {
-  display: block;
-  margin: 12px 0;
-  max-width: 100%;
-}
-
-input, button {
-  font-size: 14px;
-}
-
-.item {
-  background: #374151;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 6px;
-  overflow-wrap: anywhere;
-}
-
-.item img {
-  display: block;
-  width: auto;
-  max-width: 100%;
-  max-height: 180px;
-  margin: 10px 0;
-  object-fit: contain;
-}
-
-.item button {
-  padding: 8px 12px;
-}
-
-#preview {
-  max-width: 100%;
-  max-height: 400px;
-  display: block;
-  margin: 12px auto;
-}
-
-#status {
-  color: #fcd34d;
-  overflow-wrap: anywhere;
-}
-
-.small {
-  color: #d1d5db;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-footer {
-  padding: 20px;
-  text-align: center;
-  color: #9ca3af;
-}
+*{box-sizing:border-box}
+body{margin:0;background:#111827;color:#f3f4f6;font-family:Arial,sans-serif}
+header{padding:20px;background:#172033;border-bottom:1px solid #374151}
+h1{margin:0 0 8px;color:#f5c76b;font-size:25px}
+p{color:#cbd5e1;line-height:1.5}
+main{max-width:1100px;margin:auto;padding:18px}
+.panel{background:#1e293b;border:1px solid #374151;border-radius:12px;padding:16px;margin-bottom:16px}
+h2{font-size:18px;margin-top:0}
+input[type=file]{width:100%;padding:12px;background:#111827;border-radius:8px;color:white;margin:8px 0}
+button{background:#d6a84f;color:#111827;border:0;padding:12px 16px;border-radius:8px;font-weight:bold;cursor:pointer;margin:5px 5px 5px 0}
+button:disabled{opacity:.5;cursor:not-allowed}
+.secondary{background:#334155;color:white}
+#screen{width:100%;max-height:440px;aspect-ratio:16/9;background:#050505;border-radius:8px;display:block}
+#status{white-space:pre-wrap;background:#111827;padding:12px;border-radius:8px;line-height:1.6}
+#timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.tile{background:#111827;border:1px solid #475569;padding:8px;border-radius:8px;min-width:0}
+.tile img{width:100%;aspect-ratio:16/9;object-fit:contain;background:#020617}
+.tile input{width:100%;margin-top:8px}
+.small{font-size:13px;color:#cbd5e1}
+a{color:#f5c76b}
 </style>
 </head>
-
 <body>
-
 <header>
-  <h1>ArmorLore AI Auto Editor</h1>
-  <p>Your personal browser-based video workspace</p>
+<h1>ArmorLore AI Auto Editor</h1>
+<p>Voice-over timeline • Original images • Video preview • WebM export</p>
 </header>
 
 <main>
+<section class="panel">
+<h2>1. Upload your voice-over</h2>
+<p>Select all narration clips in the order you want them to play. Your original audio files will not be changed.</p>
+<input id="audioFiles" type="file" accept="audio/*" multiple>
+<div id="audioInfo" class="small">No audio files selected.</div>
+</section>
 
-  <section class="panel">
-    <h2>1. Upload Voice-over Files</h2>
-    <p class="small">
-      Select multiple audio files from your device.
-      Files will appear in the order you add them.
-    </p>
+<section class="panel">
+<h2>2. Upload your original images</h2>
+<p>Select your own illustrations. Images will not be generated or replaced.</p>
+<input id="imageFiles" type="file" accept="image/*" multiple>
+<div id="imageInfo" class="small">No images selected.</div>
+<button id="buildBtn">Build timeline</button>
+</section>
 
-    <input
-      id="audioInput"
-      type="file"
-      accept="audio/*"
-      multiple
-    >
+<section class="panel">
+<h2>3. Preview</h2>
+<canvas id="screen" width="1280" height="720"></canvas>
+<p id="timeInfo">Timeline not built yet.</p>
+<button id="previewBtn" disabled>Play preview</button>
+<button id="stopBtn" class="secondary" disabled>Stop preview</button>
+<button id="exportBtn" disabled>Export video (WebM)</button>
+<div id="status" role="status">Ready. Upload audio and images to begin.</div>
+<p class="small">Export runs in this browser. Keep this tab open until the export finishes.</p>
+</section>
 
-    <div id="audioList"></div>
-    <audio id="audioPlayer" controls style="width:100%"></audio>
-  </section>
-
-  <section class="panel">
-    <h2>2. Add Your Original Images</h2>
-    <p class="small">
-      Select your own images. This tool displays the selected
-      originals without generating or replacing them.
-    </p>
-
-    <input
-      id="imageInput"
-      type="file"
-      accept="image/*"
-      multiple
-    >
-
-    <div id="imageList"></div>
-  </section>
-
-  <section class="panel">
-    <h2>3. Image Preview</h2>
-    <p class="small">
-      Choose Preview on any image to view it here.
-    </p>
-
-    <img id="preview" alt="Selected image preview" hidden>
-    <p id="previewMessage">No image selected yet.</p>
-  </section>
-
-  <section class="panel">
-    <h2>4. Project Status</h2>
-    <p id="status">Editor loaded. No files selected yet.</p>
-
-    <p class="small">
-      Current version: file selection, audio playback,
-      image preview and manual image ordering.
-      Automatic narration synchronization and MP4 export
-      are not implemented in this version.
-    </p>
-  </section>
-
+<section class="panel">
+<h2>4. Image timeline</h2>
+<p class="small">Adjust the duration of each image in seconds. The initial durations are distributed across the total narration length.</p>
+<div id="timeline"></div>
+</section>
 </main>
 
-<footer>
-  ArmorLore AI Auto Editor — First Test Version
-</footer>
-
 <script>
-"use strict";
+const $ = id => document.getElementById(id);
+const canvas = $("screen");
+const ctx = canvas.getContext("2d");
 
-const audioInput = document.getElementById("audioInput");
-const imageInput = document.getElementById("imageInput");
-const audioList = document.getElementById("audioList");
-const imageList = document.getElementById("imageList");
-const audioPlayer = document.getElementById("audioPlayer");
-const preview = document.getElementById("preview");
-const previewMessage = document.getElementById("previewMessage");
-const status = document.getElementById("status");
+let audios = [];
+let images = [];
+let durations = [];
+let totalDuration = 0;
+let previewRAF = null;
+let previewStart = 0;
+let previewing = false;
+let exportBusy = false;
+let audioContext = null;
+let activeAudio = null;
+let stopRequested = false;
+let exportRecorder = null;
+let exportChunks = [];
+let imageURLs = [];
 
-let audioFiles = [];
-let imageFiles = [];
-let currentAudioUrl = null;
-let currentPreviewUrl = null;
-
-function makeButton(label, action, disabled = false) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.textContent = label;
-  button.disabled = disabled;
-  button.addEventListener("click", action);
-  return button;
+function status(message) {
+  $("status").textContent = message;
 }
 
-function updateStatus() {
-  status.textContent =
-    "Audio files: " + audioFiles.length +
-    " | Image files: " + imageFiles.length +
-    " | Original files remain unchanged on your device.";
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds)) return "--:--";
+  const s = Math.max(0, Math.floor(seconds));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
-audioInput.addEventListener("change", () => {
-  const selected = Array.from(audioInput.files || []);
-
-  for (const file of selected) {
-    if (file.type.startsWith("audio/")) {
-      audioFiles.push(file);
-    }
+function stopAudio() {
+  if (activeAudio) {
+    activeAudio.pause();
+    activeAudio.onended = null;
+    activeAudio.onerror = null;
+    activeAudio.removeAttribute("src");
+    activeAudio.load();
+    activeAudio = null;
   }
+}
 
-  renderAudio();
-  updateStatus();
+function stopPreview() {
+  previewing = false;
+  if (previewRAF) cancelAnimationFrame(previewRAF);
+  previewRAF = null;
+  stopAudio();
+  $("stopBtn").disabled = true;
+  $("previewBtn").disabled = !images.length || !audios.length;
+}
 
-  // Allow selecting the same file again if needed.
-  audioInput.value = "";
+$("audioFiles").addEventListener("change", async event => {
+  stopPreview();
+  audios = Array.from(event.target.files || []);
+  totalDuration = 0;
+  $("audioInfo").textContent = "Reading audio durations…";
+  const durationsFound = await Promise.all(audios.map(file => new Promise(resolve => {
+    const audio = new Audio();
+    audio.preload = "metadata";
+    audio.onloadedmetadata = () => {
+      const d = audio.duration;
+      URL.revokeObjectURL(audio.src);
+      resolve(Number.isFinite(d) ? d : 0);
+    };
+    audio.onerror = () => {
+      URL.revokeObjectURL(audio.src);
+      resolve(0);
+    };
+    audio.src = URL.createObjectURL(file);
+  })));
+  totalDuration = durationsFound.reduce((sum, d) => sum + d, 0);
+  const badCount = durationsFound.filter(d => d <= 0).length;
+  $("audioInfo").textContent =
+    `${audios.length} audio file(s) • Total duration: ${formatTime(totalDuration)}` +
+    (badCount ? ` • ${badCount} file(s) could not be measured.` : "");
+  $("buildBtn").disabled = !audios.length || !images.length || totalDuration <= 0;
 });
 
-imageInput.addEventListener("change", () => {
-  const selected = Array.from(imageInput.files || []);
-
-  for (const file of selected) {
-    if (file.type.startsWith("image/")) {
-      imageFiles.push(file);
-    }
-  }
-
-  renderImages();
-  updateStatus();
-
-  imageInput.value = "";
+$("imageFiles").addEventListener("change", event => {
+  stopPreview();
+  imageURLs.forEach(URL.revokeObjectURL);
+  imageURLs = [];
+  images = Array.from(event.target.files || []).map(file => {
+    const url = URL.createObjectURL(file);
+    imageURLs.push(url);
+    return {file, url, img:null};
+  });
+  $("imageInfo").textContent = `${images.length} original image(s) selected.`;
+  Promise.all(images.map(item => new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => { item.img = img; resolve(); };
+    img.onerror = resolve;
+    img.src = item.url;
+  }))).then(() => {
+    $("buildBtn").disabled = !audios.length || !images.length || totalDuration <= 0;
+  });
 });
 
-function renderAudio() {
-  audioList.replaceChildren();
+function drawImageAt(time) {
+  ctx.fillStyle = "#050505";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (!images.length) return;
 
-  if (audioFiles.length === 0) {
-    const message = document.createElement("p");
-    message.textContent = "No audio files added.";
-    audioList.appendChild(message);
+  let index = 0;
+  let cursor = 0;
+  for (let i = 0; i < durations.length; i++) {
+    if (time < cursor + durations[i] || i === durations.length - 1) {
+      index = i;
+      break;
+    }
+    cursor += durations[i];
+  }
+  const img = images[index]?.img;
+  if (!img || !img.naturalWidth) return;
+
+  const scale = Math.min(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
+  const w = img.naturalWidth * scale;
+  const h = img.naturalHeight * scale;
+  ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+}
+
+function buildTimeline() {
+  stopPreview();
+  if (!audios.length || !images.length || totalDuration <= 0) {
+    status("Please upload valid audio files and at least one image first.");
     return;
   }
+  durations = images.map(() => totalDuration / images.length);
+  renderTimeline();
+  drawImageAt(0);
+  $("timeInfo").textContent = `Total narration: ${formatTime(totalDuration)} • ${images.length} image(s)`;
+  $("previewBtn").disabled = false;
+  $("exportBtn").disabled = false;
+  status("Timeline built. Images are evenly distributed across the total narration duration. Review the order and adjust durations if needed.");
+}
 
-  audioFiles.forEach((file, index) => {
-    const item = document.createElement("div");
-    item.className = "item";
+function renderTimeline() {
+  const container = $("timeline");
+  container.replaceChildren();
+  images.forEach((item, i) => {
+    const tile = document.createElement("div");
+    tile.className = "tile";
 
-    const name = document.createElement("div");
-    name.textContent = (index + 1) + ". " + file.name;
-    item.appendChild(name);
+    const img = document.createElement("img");
+    img.src = item.url;
+    img.alt = `Original image ${i + 1}`;
+    tile.appendChild(img);
 
-    const size = document.createElement("p");
-    size.className = "small";
-    size.textContent =
-      (file.size / (1024 * 1024)).toFixed(2) + " MB";
-    item.appendChild(size);
+    const label = document.createElement("div");
+    label.className = "small";
+    label.textContent = `Image ${i + 1}`;
+    tile.appendChild(label);
 
-    item.appendChild(makeButton("Play", () => {
-      if (currentAudioUrl) {
-        URL.revokeObjectURL(currentAudioUrl);
+    const durationLabel = document.createElement("label");
+    durationLabel.className = "small";
+    durationLabel.textContent = "Duration (seconds)";
+    tile.appendChild(durationLabel);
+
+    const input = document.createElement("input");
+    input.type = "number";
+    input.min = "0.1";
+    input.max = String(Math.max(0.1, totalDuration));
+    input.step = "0.1";
+    input.value = durations[i].toFixed(1);
+    input.setAttribute("aria-label", `Duration for image ${i + 1}`);
+    input.addEventListener("change", () => {
+      const value = Number(input.value);
+      if (!Number.isFinite(value) || value <= 0) {
+        input.value = durations[i].toFixed(1);
+        return;
       }
-
-      currentAudioUrl = URL.createObjectURL(file);
-      audioPlayer.src = currentAudioUrl;
-      audioPlayer.play().catch(() => {
-        status.textContent =
-          "Audio selected. Press Play on the audio player.";
-      });
-    }));
-
-    item.appendChild(makeButton(
-      "Move Up",
-      () => {
-        if (index > 0) {
-          [audioFiles[index - 1], audioFiles[index]] =
-            [audioFiles[index], audioFiles[index - 1]];
-          renderAudio();
-        }
-      },
-      index === 0
-    ));
-
-    item.appendChild(makeButton(
-      "Move Down",
-      () => {
-        if (index < audioFiles.length - 1) {
-          [audioFiles[index + 1], audioFiles[index]] =
-            [audioFiles[index], audioFiles[index + 1]];
-          renderAudio();
-        }
-      },
-      index === audioFiles.length - 1
-    ));
-
-    item.appendChild(makeButton("Remove", () => {
-      audioFiles.splice(index, 1);
-      renderAudio();
-      updateStatus();
-    }));
-
-    audioList.appendChild(item);
+      durations[i] = value;
+      const sum = durations.reduce((a,b) => a+b, 0);
+      $("timeInfo").textContent =
+        `Image durations: ${sum.toFixed(1)} seconds • Narration: ${formatTime(totalDuration)}` +
+        (Math.abs(sum-totalDuration) > 0.5 ? " • Durations do not match narration length." : "");
+      drawImageAt(0);
+    });
+    tile.appendChild(input);
+    container.appendChild(tile);
   });
 }
 
-function renderImages() {
-  imageList.replaceChildren();
+$("buildBtn").addEventListener("click", buildTimeline);
 
-  if (imageFiles.length === 0) {
-    const message = document.createElement("p");
-    message.textContent = "No images added.";
-    imageList.appendChild(message);
-    return;
-  }
-
-  imageFiles.forEach((file, index) => {
-    const item = document.createElement("div");
-    item.className = "item";
-
-    const name = document.createElement("div");
-    name.textContent = (index + 1) + ". " + file.name;
-    item.appendChild(name);
-
-    const size = document.createElement("p");
-    size.className = "small";
-    size.textContent =
-      (file.size / (1024 * 1024)).toFixed(2) + " MB";
-    item.appendChild(size);
-
-    item.appendChild(makeButton("Preview", () => {
-      if (currentPreviewUrl) {
-        URL.revokeObjectURL(currentPreviewUrl);
+function playAudioSequence() {
+  return new Promise((resolve, reject) => {
+    let index = 0;
+    const playNext = () => {
+      if (stopRequested || index >= audios.length) {
+        resolve();
+        return;
       }
-
-      currentPreviewUrl = URL.createObjectURL(file);
-      preview.src = currentPreviewUrl;
-      preview.hidden = false;
-      previewMessage.textContent = file.name;
-    }));
-
-    item.appendChild(makeButton(
-      "Move Up",
-      () => {
-        if (index > 0) {
-          [imageFiles[index - 1], imageFiles[index]] =
-            [imageFiles[index], imageFiles[index - 1]];
-          renderImages();
-        }
-      },
-      index === 0
-    ));
-
-    item.appendChild(makeButton(
-      "Move Down",
-      () => {
-        if (index < imageFiles.length - 1) {
-          [imageFiles[index + 1], imageFiles[index]] =
-            [imageFiles[index], imageFiles[index + 1]];
-          renderImages();
-        }
-      },
-      index === imageFiles.length - 1
-    ));
-
-    item.appendChild(makeButton("Remove", () => {
-      imageFiles.splice(index, 1);
-      renderImages();
-      updateStatus();
-    }));
-
-    imageList.appendChild(item);
+      const file = audios[index++];
+      const audio = new Audio();
+      activeAudio = audio;
+      audio.preload = "auto";
+      audio.onended = playNext;
+      audio.onerror = () => reject(new Error("An audio file could not be played."));
+      audio.src = URL.createObjectURL(file);
+      audio.play().catch(reject);
+    };
+    playNext();
   });
 }
 
-window.addEventListener("beforeunload", () => {
-  if (currentAudioUrl) URL.revokeObjectURL(currentAudioUrl);
-  if (currentPreviewUrl) URL.revokeObjectURL(currentPreviewUrl);
+async function startPreview() {
+  if (!audios.length || !images.length || !durations.length) return;
+  stopPreview();
+  stopRequested = false;
+  previewing = true;
+  previewStart = performance.now();
+  $("previewBtn").disabled = true;
+  $("stopBtn").disabled = false;
+  status("Preview playing…");
+
+  function frame(now) {
+    if (!previewing) return;
+    const elapsed = (now - previewStart) / 1000;
+    drawImageAt(elapsed);
+    if (elapsed >= totalDuration) {
+      stopPreview();
+      status("Preview finished.");
+      return;
+    }
+    previewRAF = requestAnimationFrame(frame);
+  }
+  previewRAF = requestAnimationFrame(frame);
+
+  try {
+    await playAudioSequence();
+    if (previewing) {
+      stopPreview();
+      status("Preview finished.");
+    }
+  } catch (err) {
+    stopPreview();
+    status("Audio playback error: " + err.message);
+  }
+}
+
+$("previewBtn").addEventListener("click", startPreview);
+$("stopBtn").addEventListener("click", () => {
+  stopRequested = true;
+  stopPreview();
+  status("Preview stopped.");
 });
 
-renderAudio();
-renderImages();
-updateStatus();
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function exportVideo() {
+  if (exportBusy || !audios.length || !images.length || !durations.length) return;
+  if (!("MediaRecorder" in window) || !canvas.captureStream) {
+    status("This browser does not support video recording from canvas.");
+    return;
+  }
+  if (Math.abs(durations.reduce((a,b)=>a+b,0) - totalDuration) > 0.5) {
+    status("Please adjust image durations so their total matches the narration duration before exporting.");
+    return;
+  }
+
+  exportBusy = true;
+  stopPreview();
+  stopRequested = false;
+  $("exportBtn").disabled = true;
+  $("previewBtn").disabled = true;
+  status("Preparing video export…");
+
+  let canvasStream, combinedStream, destination;
+  try {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    await audioContext.resume();
+    destination = audioContext.createMediaStreamDestination();
+    canvasStream = canvas.captureStream(30);
+
+    const audioTracks = destination.stream.getAudioTracks();
+    combinedStream = new MediaStream([
+      ...canvasStream.getVideoTracks(),
+      ...audioTracks
+    ]);
+
+    const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+      ? "video/webm;codecs=vp9,opus"
+      : "video/webm";
+
+    exportChunks = [];
+    exportRecorder = new MediaRecorder(combinedStream, {mimeType:mime});
+    exportRecorder.ondataavailable = e => {
+      if (e.data && e.data.size) exportChunks.push(e.data);
+    };
+
+    const recordingStopped = new Promise((resolve, reject) => {
+      exportRecorder.onstop = resolve;
+      exportRecorder.onerror = () => reject(new Error("Video recording failed."));
+    });
+
+    exportRecorder.start(1000);
+    const startedAt = performance.now();
+    let clipIndex = 0;
+    let clipAudio = null;
+
+    const audioFinished = new Promise((resolve, reject) => {
+      const nextClip = async () => {
+        if (clipAudio) {
+          clipAudio.onended = null;
+          clipAudio.onerror = null;
+        }
+        if (clipIndex >= audios.length) {
+          resolve();
+          return;
+        }
+        const file = audios[clipIndex++];
+        clipAudio = new Audio();
+        clipAudio.preload = "auto";
+        clipAudio.crossOrigin = "anonymous";
+        try {
+          const url = URL.createObjectURL(file);
+          clipAudio.src = url;
+          const source = audioContext.createMediaElementSource(clipAudio);
+          source.connect(destination);
+          source.connect(audioContext.destination);
+          clipAudio.onended = nextClip;
+          clipAudio.onerror = () => reject(new Error("An audio clip failed during export."));
+          await clipAudio.play();
+        } catch (e) {
+          reject(e);
+        }
+      };
+      nextClip();
+    });
+
+    while (performance.now() - startedAt < totalDuration * 1000 && !stopRequested) {
+      const elapsed = (performance.now() - startedAt) / 1000;
+      drawImageAt(elapsed);
+      status(`Exporting video… ${Math.min(100, Math.floor(elapsed / totalDuration * 100))}%`);
+      await sleep(33);
+    }
+
+    if (clipAudio) {
+      clipAudio.pause();
+      clipAudio.onended = null;
+    }
+    stopRequested = true;
+    try { await audioFinished; } catch (e) {
+      if (performance.now() - startedAt < totalDuration * 1000 - 500) throw e;
+    }
+    if (exportRecorder.state !== "inactive") exportRecorder.stop();
+    await recordingStopped;
+
+    const blob = new Blob(exportChunks, {type:"video/webm"});
+    if (!blob.size) throw new Error("The exported video is empty.");
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "ArmorLore-Video.webm";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    status(`Export complete. File size: ${(blob.size / (1024 * 1024)).toFixed(1)} MB. Check your Downloads folder.`);
+  } catch (err) {
+    if (exportRecorder && exportRecorder.state !== "inactive") {
+      try { exportRecorder.stop(); } catch (_) {}
+    }
+    status("Export failed: " + (err.message || "Unknown error") + "\nTry fewer files or use an updated Chrome browser.");
+  } finally {
+    if (canvasStream) canvasStream.getTracks().forEach(t => t.stop());
+    if (combinedStream) combinedStream.getTracks().forEach(t => t.stop());
+    if (audioContext) {
+      try { await audioContext.close(); } catch (_) {}
+      audioContext = null;
+    }
+    exportBusy = false;
+    $("exportBtn").disabled = !durations.length;
+    $("previewBtn").disabled = !durations.length;
+    drawImageAt(0);
+  }
+}
+
+$("exportBtn").addEventListener("click", exportVideo);
+drawImageAt(0);
 </script>
-
 </body>
 </html>
