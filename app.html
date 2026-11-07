@@ -1,455 +1,2768 @@
-
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ArmorLore AI Auto Editor</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#111827;color:#f3f4f6;font-family:Arial,sans-serif}
-header{padding:20px;background:#172033;border-bottom:1px solid #374151}
-h1{margin:0 0 8px;color:#f5c76b;font-size:25px}
-p{color:#cbd5e1;line-height:1.5}
-main{max-width:1100px;margin:auto;padding:18px}
-.panel{background:#1e293b;border:1px solid #374151;border-radius:12px;padding:16px;margin-bottom:16px}
-h2{font-size:18px;margin-top:0}
-input[type=file]{width:100%;padding:12px;background:#111827;border-radius:8px;color:white;margin:8px 0}
-button{background:#d6a84f;color:#111827;border:0;padding:12px 16px;border-radius:8px;font-weight:bold;cursor:pointer;margin:5px 5px 5px 0}
-button:disabled{opacity:.5;cursor:not-allowed}
-.secondary{background:#334155;color:white}
-#screen{width:100%;max-height:440px;aspect-ratio:16/9;background:#050505;border-radius:8px;display:block}
-#status{white-space:pre-wrap;background:#111827;padding:12px;border-radius:8px;line-height:1.6}
-#timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
-.tile{background:#111827;border:1px solid #475569;padding:8px;border-radius:8px;min-width:0}
-.tile img{width:100%;aspect-ratio:16/9;object-fit:contain;background:#020617}
-.tile input{width:100%;margin-top:8px}
-.small{font-size:13px;color:#cbd5e1}
-a{color:#f5c76b}
+
+body{
+  margin:0;
+  background:#111827;
+  color:#f3f4f6;
+  font-family:Arial,sans-serif;
+}
+
+header{
+  padding:20px;
+  background:#172033;
+  border-bottom:1px solid #374151;
+}
+
+h1{
+  margin:0 0 8px;
+  color:#f5c76b;
+  font-size:25px;
+}
+
+p{
+  color:#cbd5e1;
+  line-height:1.5;
+}
+
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:18px;
+}
+
+.panel{
+  background:#1e293b;
+  border:1px solid #374151;
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:16px;
+}
+
+h2{
+  font-size:18px;
+  margin-top:0;
+}
+
+input[type=file]{
+  width:100%;
+  padding:12px;
+  background:#111827;
+  border-radius:8px;
+  color:white;
+  margin:8px 0;
+}
+
+button{
+  background:#d6a84f;
+  color:#111827;
+  border:0;
+  padding:12px 16px;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+  margin:5px 5px 5px 0;
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.secondary{
+  background:#334155;
+  color:white;
+}
+
+.danger{
+  background:#7f1d1d;
+  color:white;
+}
+
+#screen{
+  width:100%;
+  max-height:500px;
+  aspect-ratio:16/9;
+  background:#050505;
+  border-radius:8px;
+  display:block;
+}
+
+#status{
+  white-space:pre-wrap;
+  background:#111827;
+  padding:12px;
+  border-radius:8px;
+  line-height:1.6;
+  margin-top:10px;
+}
+
+#timeline{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.tile{
+  background:#111827;
+  border:1px solid #475569;
+  padding:10px;
+  border-radius:8px;
+}
+
+.tile-row{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.tile img{
+  width:180px;
+  height:105px;
+  object-fit:contain;
+  background:#020617;
+  border-radius:6px;
+  flex-shrink:0;
+}
+
+.tile-info{
+  flex:1;
+  min-width:0;
+}
+
+.tile-title{
+  font-weight:bold;
+  color:#f5c76b;
+  margin-bottom:5px;
+}
+
+.tile-text{
+  color:#cbd5e1;
+  font-size:13px;
+  line-height:1.4;
+}
+
+.tile input{
+  width:100%;
+  margin-top:8px;
+}
+
+.small{
+  font-size:13px;
+  color:#cbd5e1;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:5px;
+  background:#334155;
+  color:#e2e8f0;
+  font-size:12px;
+  margin-right:5px;
+}
+
+.progress{
+  width:100%;
+  height:10px;
+  background:#020617;
+  border-radius:5px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.progress-bar{
+  width:0%;
+  height:100%;
+  background:#d6a84f;
+  transition:width .2s;
+}
+
+@media(max-width:650px){
+  .tile-row{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .tile img{
+    width:100%;
+    height:auto;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <header>
 <h1>ArmorLore AI Auto Editor</h1>
-<p>Voice-over timeline • Original images • Video preview • WebM export</p>
+<p>
+Voice-over analysis • Original images • AI-assisted timeline • Preview • WebM export
+</p>
 </header>
 
 <main>
+
 <section class="panel">
+
 <h2>1. Upload your voice-over</h2>
-<p>Select all narration clips in the order you want them to play. Your original audio files will not be changed.</p>
-<input id="audioFiles" type="file" accept="audio/*" multiple>
-<div id="audioInfo" class="small">No audio files selected.</div>
+
+<p>
+Select all narration clips in the exact order you want them to play.
+</p>
+
+<input
+  id="audioFiles"
+  type="file"
+  accept="audio/*"
+  multiple
+>
+
+<div id="audioInfo" class="small">
+No audio files selected.
+</div>
+
 </section>
 
+
 <section class="panel">
+
 <h2>2. Upload your original images</h2>
-<p>Select your own illustrations. Images will not be generated or replaced.</p>
-<input id="imageFiles" type="file" accept="image/*" multiple>
-<div id="imageInfo" class="small">No images selected.</div>
-<button id="buildBtn">Build timeline</button>
+
+<p>
+Select your own illustrations. The editor will not generate replacement images.
+</p>
+
+<input
+  id="imageFiles"
+  type="file"
+  accept="image/*"
+  multiple
+>
+
+<div id="imageInfo" class="small">
+No images selected.
+</div>
+
 </section>
 
-<section class="panel">
-<h2>3. Preview</h2>
-<canvas id="screen" width="1280" height="720"></canvas>
-<p id="timeInfo">Timeline not built yet.</p>
-<button id="previewBtn" disabled>Play preview</button>
-<button id="stopBtn" class="secondary" disabled>Stop preview</button>
-<button id="exportBtn" disabled>Export video (WebM)</button>
-<div id="status" role="status">Ready. Upload audio and images to begin.</div>
-<p class="small">Export runs in this browser. Keep this tab open until the export finishes.</p>
-</section>
 
 <section class="panel">
-<h2>4. Image timeline</h2>
-<p class="small">Adjust the duration of each image in seconds. The initial durations are distributed across the total narration length.</p>
+
+<h2>3. AI analysis</h2>
+
+<p>
+The editor will send the voice-over to your private Cloudflare backend for analysis.
+Your Gemini API key is never placed inside this page.
+</p>
+
+<button id="analyzeBtn">
+Analyze voice-over
+</button>
+
+<button id="buildBtn" disabled>
+Build AI timeline
+</button>
+
+<div class="progress">
+  <div id="progressBar" class="progress-bar"></div>
+</div>
+
+<div id="analysisInfo" class="small">
+Waiting for audio and images.
+</div>
+
+</section>
+
+
+<section class="panel">
+
+<h2>4. Preview</h2>
+
+<canvas
+  id="screen"
+  width="1280"
+  height="720">
+</canvas>
+
+<p id="timeInfo">
+Timeline not built yet.
+</p>
+
+<button id="previewBtn" disabled>
+Play preview
+</button>
+
+<button
+  id="stopBtn"
+  class="secondary"
+  disabled>
+Stop preview
+</button>
+
+<button
+  id="exportBtn"
+  disabled>
+Export video (WebM)
+</button>
+
+<div id="status">
+Ready. Upload your voice-over and original images.
+</div>
+
+</section>
+
+
+<section class="panel">
+
+<h2>5. AI image timeline</h2>
+
+<p class="small">
+Each image is connected to a narration section. You can still change durations manually.
+</p>
+
 <div id="timeline"></div>
+
 </section>
+
 </main>
 
+
 <script>
+
 const $ = id => document.getElementById(id);
+
 const canvas = $("screen");
 const ctx = canvas.getContext("2d");
 
+const BACKEND_URL =
+  "https://shrill-unit-f3bf.gisadoy523.workers.dev";
+
+
 let audios = [];
 let images = [];
-let durations = [];
+
+let audioDurations = [];
 let totalDuration = 0;
+
+let analysis = null;
+
+let timelineItems = [];
+
 let previewRAF = null;
 let previewStart = 0;
 let previewing = false;
-let exportBusy = false;
-let audioContext = null;
+
 let activeAudio = null;
-let stopRequested = false;
-let exportRecorder = null;
-let exportChunks = [];
+
 let imageURLs = [];
 
-function status(message) {
+let exportBusy = false;
+
+let stopRequested = false;
+
+let audioContext = null;
+
+
+/* --------------------------------------------------
+   BASIC HELPERS
+-------------------------------------------------- */
+
+function status(message){
+
   $("status").textContent = message;
+
 }
 
-function formatTime(seconds) {
-  if (!Number.isFinite(seconds)) return "--:--";
-  const s = Math.max(0, Math.floor(seconds));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+
+function formatTime(seconds){
+
+  if(!Number.isFinite(seconds)){
+    return "--:--";
+  }
+
+  const s =
+    Math.max(0,Math.floor(seconds));
+
+  return (
+    Math.floor(s/60)
+    +
+    ":"
+    +
+    String(s%60).padStart(2,"0")
+  );
 }
 
-function stopAudio() {
-  if (activeAudio) {
-    activeAudio.pause();
+
+function setProgress(value){
+
+  const safe =
+    Math.max(0,Math.min(100,value));
+
+  $("progressBar").style.width =
+    safe + "%";
+}
+
+
+function sleep(ms){
+
+  return new Promise(resolve =>
+    setTimeout(resolve,ms)
+  );
+
+}
+
+
+/* --------------------------------------------------
+   STOP AUDIO
+-------------------------------------------------- */
+
+function stopAudio(){
+
+  if(activeAudio){
+
+    try{
+      activeAudio.pause();
+    }catch(_){}
+
     activeAudio.onended = null;
     activeAudio.onerror = null;
-    activeAudio.removeAttribute("src");
-    activeAudio.load();
+
+    try{
+      activeAudio.removeAttribute("src");
+      activeAudio.load();
+    }catch(_){}
+
     activeAudio = null;
   }
+
 }
 
-function stopPreview() {
+
+/* --------------------------------------------------
+   STOP PREVIEW
+-------------------------------------------------- */
+
+function stopPreview(){
+
   previewing = false;
-  if (previewRAF) cancelAnimationFrame(previewRAF);
-  previewRAF = null;
+
+  if(previewRAF){
+
+    cancelAnimationFrame(previewRAF);
+
+    previewRAF = null;
+  }
+
   stopAudio();
+
   $("stopBtn").disabled = true;
-  $("previewBtn").disabled = !images.length || !audios.length;
+
+  $("previewBtn").disabled =
+    !timelineItems.length;
+
 }
 
-$("audioFiles").addEventListener("change", async event => {
-  stopPreview();
-  audios = Array.from(event.target.files || []);
-  totalDuration = 0;
-  $("audioInfo").textContent = "Reading audio durations…";
-  const durationsFound = await Promise.all(audios.map(file => new Promise(resolve => {
-    const audio = new Audio();
-    audio.preload = "metadata";
-    audio.onloadedmetadata = () => {
-      const d = audio.duration;
-      URL.revokeObjectURL(audio.src);
-      resolve(Number.isFinite(d) ? d : 0);
-    };
-    audio.onerror = () => {
-      URL.revokeObjectURL(audio.src);
-      resolve(0);
-    };
-    audio.src = URL.createObjectURL(file);
-  })));
-  totalDuration = durationsFound.reduce((sum, d) => sum + d, 0);
-  const badCount = durationsFound.filter(d => d <= 0).length;
-  $("audioInfo").textContent =
-    `${audios.length} audio file(s) • Total duration: ${formatTime(totalDuration)}` +
-    (badCount ? ` • ${badCount} file(s) could not be measured.` : "");
-  $("buildBtn").disabled = !audios.length || !images.length || totalDuration <= 0;
-});
 
-$("imageFiles").addEventListener("change", event => {
-  stopPreview();
-  imageURLs.forEach(URL.revokeObjectURL);
-  imageURLs = [];
-  images = Array.from(event.target.files || []).map(file => {
-    const url = URL.createObjectURL(file);
-    imageURLs.push(url);
-    return {file, url, img:null};
-  });
-  $("imageInfo").textContent = `${images.length} original image(s) selected.`;
-  Promise.all(images.map(item => new Promise(resolve => {
-    const img = new Image();
-    img.onload = () => { item.img = img; resolve(); };
-    img.onerror = resolve;
-    img.src = item.url;
-  }))).then(() => {
-    $("buildBtn").disabled = !audios.length || !images.length || totalDuration <= 0;
-  });
-});
+/* --------------------------------------------------
+   AUDIO FILES
+-------------------------------------------------- */
 
-function drawImageAt(time) {
-  ctx.fillStyle = "#050505";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  if (!images.length) return;
+$("audioFiles").addEventListener(
+  "change",
+  async event => {
 
-  let index = 0;
-  let cursor = 0;
-  for (let i = 0; i < durations.length; i++) {
-    if (time < cursor + durations[i] || i === durations.length - 1) {
-      index = i;
-      break;
-    }
-    cursor += durations[i];
-  }
-  const img = images[index]?.img;
-  if (!img || !img.naturalWidth) return;
+    stopPreview();
 
-  const scale = Math.min(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
-  const w = img.naturalWidth * scale;
-  const h = img.naturalHeight * scale;
-  ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
-}
+    audios =
+      Array.from(
+        event.target.files || []
+      );
 
-function buildTimeline() {
-  stopPreview();
-  if (!audios.length || !images.length || totalDuration <= 0) {
-    status("Please upload valid audio files and at least one image first.");
-    return;
-  }
-  durations = images.map(() => totalDuration / images.length);
-  renderTimeline();
-  drawImageAt(0);
-  $("timeInfo").textContent = `Total narration: ${formatTime(totalDuration)} • ${images.length} image(s)`;
-  $("previewBtn").disabled = false;
-  $("exportBtn").disabled = false;
-  status("Timeline built. Images are evenly distributed across the total narration duration. Review the order and adjust durations if needed.");
-}
+    audioDurations = [];
 
-function renderTimeline() {
-  const container = $("timeline");
-  container.replaceChildren();
-  images.forEach((item, i) => {
-    const tile = document.createElement("div");
-    tile.className = "tile";
+    totalDuration = 0;
 
-    const img = document.createElement("img");
-    img.src = item.url;
-    img.alt = `Original image ${i + 1}`;
-    tile.appendChild(img);
+    analysis = null;
 
-    const label = document.createElement("div");
-    label.className = "small";
-    label.textContent = `Image ${i + 1}`;
-    tile.appendChild(label);
+    timelineItems = [];
 
-    const durationLabel = document.createElement("label");
-    durationLabel.className = "small";
-    durationLabel.textContent = "Duration (seconds)";
-    tile.appendChild(durationLabel);
+    $("timeline").replaceChildren();
 
-    const input = document.createElement("input");
-    input.type = "number";
-    input.min = "0.1";
-    input.max = String(Math.max(0.1, totalDuration));
-    input.step = "0.1";
-    input.value = durations[i].toFixed(1);
-    input.setAttribute("aria-label", `Duration for image ${i + 1}`);
-    input.addEventListener("change", () => {
-      const value = Number(input.value);
-      if (!Number.isFinite(value) || value <= 0) {
-        input.value = durations[i].toFixed(1);
-        return;
-      }
-      durations[i] = value;
-      const sum = durations.reduce((a,b) => a+b, 0);
-      $("timeInfo").textContent =
-        `Image durations: ${sum.toFixed(1)} seconds • Narration: ${formatTime(totalDuration)}` +
-        (Math.abs(sum-totalDuration) > 0.5 ? " • Durations do not match narration length." : "");
-      drawImageAt(0);
-    });
-    tile.appendChild(input);
-    container.appendChild(tile);
-  });
-}
+    $("audioInfo").textContent =
+      "Reading audio durations…";
 
-$("buildBtn").addEventListener("click", buildTimeline);
+    if(!audios.length){
 
-function playAudioSequence() {
-  return new Promise((resolve, reject) => {
-    let index = 0;
-    const playNext = () => {
-      if (stopRequested || index >= audios.length) {
-        resolve();
-        return;
-      }
-      const file = audios[index++];
-      const audio = new Audio();
-      activeAudio = audio;
-      audio.preload = "auto";
-      audio.onended = playNext;
-      audio.onerror = () => reject(new Error("An audio file could not be played."));
-      audio.src = URL.createObjectURL(file);
-      audio.play().catch(reject);
-    };
-    playNext();
-  });
-}
+      $("audioInfo").textContent =
+        "No audio files selected.";
 
-async function startPreview() {
-  if (!audios.length || !images.length || !durations.length) return;
-  stopPreview();
-  stopRequested = false;
-  previewing = true;
-  previewStart = performance.now();
-  $("previewBtn").disabled = true;
-  $("stopBtn").disabled = false;
-  status("Preview playing…");
-
-  function frame(now) {
-    if (!previewing) return;
-    const elapsed = (now - previewStart) / 1000;
-    drawImageAt(elapsed);
-    if (elapsed >= totalDuration) {
-      stopPreview();
-      status("Preview finished.");
       return;
     }
-    previewRAF = requestAnimationFrame(frame);
-  }
-  previewRAF = requestAnimationFrame(frame);
 
-  try {
-    await playAudioSequence();
-    if (previewing) {
-      stopPreview();
-      status("Preview finished.");
-    }
-  } catch (err) {
+
+    const durationsFound =
+      await Promise.all(
+
+        audios.map(file =>
+
+          new Promise(resolve => {
+
+            const audio =
+              new Audio();
+
+            audio.preload =
+              "metadata";
+
+            const url =
+              URL.createObjectURL(file);
+
+            audio.onloadedmetadata =
+              () => {
+
+                const d =
+                  audio.duration;
+
+                URL.revokeObjectURL(url);
+
+                resolve(
+                  Number.isFinite(d)
+                    ? d
+                    : 0
+                );
+
+              };
+
+            audio.onerror =
+              () => {
+
+                URL.revokeObjectURL(url);
+
+                resolve(0);
+
+              };
+
+            audio.src = url;
+
+          })
+
+        )
+
+      );
+
+
+    audioDurations =
+      durationsFound;
+
+    totalDuration =
+      durationsFound.reduce(
+        (sum,d) => sum+d,
+        0
+      );
+
+
+    const bad =
+      durationsFound.filter(
+        d => d<=0
+      ).length;
+
+
+    $("audioInfo").textContent =
+      audios.length
+      +
+      " audio file(s) • Total duration: "
+      +
+      formatTime(totalDuration)
+      +
+      (
+        bad
+        ? " • " + bad +
+          " file(s) could not be measured."
+        : ""
+      );
+
+
+    updateButtonState();
+
+  }
+
+);
+
+
+/* --------------------------------------------------
+   IMAGE FILES
+-------------------------------------------------- */
+
+$("imageFiles").addEventListener(
+  "change",
+  async event => {
+
     stopPreview();
-    status("Audio playback error: " + err.message);
+
+    imageURLs.forEach(
+      url => URL.revokeObjectURL(url)
+    );
+
+    imageURLs = [];
+
+    images =
+      Array.from(
+        event.target.files || []
+      ).map(file => {
+
+        const url =
+          URL.createObjectURL(file);
+
+        imageURLs.push(url);
+
+        return {
+          file,
+          url,
+          img:null,
+          description:""
+        };
+
+      });
+
+
+    $("imageInfo").textContent =
+      images.length
+      +
+      " original image(s) selected.";
+
+
+    await Promise.all(
+
+      images.map(item =>
+
+        new Promise(resolve => {
+
+          const img =
+            new Image();
+
+          img.onload = () => {
+
+            item.img = img;
+
+            resolve();
+
+          };
+
+          img.onerror =
+            resolve;
+
+          img.src = item.url;
+
+        })
+
+      )
+
+    );
+
+
+    updateButtonState();
+
   }
+
+);
+
+
+/* --------------------------------------------------
+   BUTTON STATE
+-------------------------------------------------- */
+
+function updateButtonState(){
+
+  $("analyzeBtn").disabled =
+    !audios.length ||
+    totalDuration <= 0;
+
+  $("buildBtn").disabled =
+    !analysis ||
+    !images.length;
+
 }
 
-$("previewBtn").addEventListener("click", startPreview);
-$("stopBtn").addEventListener("click", () => {
-  stopRequested = true;
-  stopPreview();
-  status("Preview stopped.");
-});
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+/* --------------------------------------------------
+   GEMINI REQUEST
+-------------------------------------------------- */
+
+async function callGemini(body){
+
+  const response =
+    await fetch(
+      BACKEND_URL + "/api/gemini",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:JSON.stringify(body)
+      }
+    );
+
+
+  const text =
+    await response.text();
+
+
+  let data;
+
+  try{
+
+    data = JSON.parse(text);
+
+  }catch(_){
+
+    throw new Error(
+      "Backend returned an invalid response."
+    );
+
+  }
+
+
+  if(!response.ok){
+
+    throw new Error(
+      data.error ||
+      "Gemini request failed."
+    );
+
+  }
+
+
+  return data;
+
 }
 
-async function exportVideo() {
-  if (exportBusy || !audios.length || !images.length || !durations.length) return;
-  if (!("MediaRecorder" in window) || !canvas.captureStream) {
-    status("This browser does not support video recording from canvas.");
-    return;
+
+/* --------------------------------------------------
+   READ GEMINI TEXT
+-------------------------------------------------- */
+
+function extractGeminiText(data){
+
+  return (
+    data
+    ?.candidates
+    ?.flatMap(c =>
+      c?.content?.parts || []
+    )
+    ?.map(p => p?.text || "")
+    ?.join("\n")
+    ?.trim()
+    || ""
+  );
+
+}
+
+
+/* --------------------------------------------------
+   CLEAN JSON
+-------------------------------------------------- */
+
+function parseJSONFromText(text){
+
+  if(!text){
+
+    throw new Error(
+      "Gemini returned no analysis."
+    );
+
   }
-  if (Math.abs(durations.reduce((a,b)=>a+b,0) - totalDuration) > 0.5) {
-    status("Please adjust image durations so their total matches the narration duration before exporting.");
-    return;
+
+
+  let cleaned =
+    text.trim();
+
+
+  if(
+    cleaned.startsWith("```")
+  ){
+
+    cleaned =
+      cleaned
+        .replace(/^```json/i,"")
+        .replace(/^```/i,"")
+        .replace(/```$/,"")
+        .trim();
+
   }
 
-  exportBusy = true;
-  stopPreview();
-  stopRequested = false;
-  $("exportBtn").disabled = true;
-  $("previewBtn").disabled = true;
-  status("Preparing video export…");
 
-  let canvasStream, combinedStream, destination;
-  try {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    await audioContext.resume();
-    destination = audioContext.createMediaStreamDestination();
-    canvasStream = canvas.captureStream(30);
+  try{
 
-    const audioTracks = destination.stream.getAudioTracks();
-    combinedStream = new MediaStream([
-      ...canvasStream.getVideoTracks(),
-      ...audioTracks
-    ]);
+    return JSON.parse(cleaned);
 
-    const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
-      ? "video/webm;codecs=vp9,opus"
-      : "video/webm";
+  }catch(_){}
 
-    exportChunks = [];
-    exportRecorder = new MediaRecorder(combinedStream, {mimeType:mime});
-    exportRecorder.ondataavailable = e => {
-      if (e.data && e.data.size) exportChunks.push(e.data);
+
+  const start =
+    cleaned.indexOf("{");
+
+  const end =
+    cleaned.lastIndexOf("}");
+
+
+  if(
+    start >= 0 &&
+    end > start
+  ){
+
+    try{
+
+      return JSON.parse(
+        cleaned.slice(
+          start,
+          end+1
+        )
+      );
+
+    }catch(_){}
+
+  }
+
+
+  throw new Error(
+    "Could not read Gemini's JSON analysis."
+  );
+
+}
+
+
+/* --------------------------------------------------
+   COMBINE AUDIO FILES INTO BASE64
+-------------------------------------------------- */
+
+async function fileToBase64(file){
+
+  const buffer =
+    await file.arrayBuffer();
+
+  let binary = "";
+
+  const bytes =
+    new Uint8Array(buffer);
+
+  const chunkSize =
+    0x8000;
+
+  for(
+    let i=0;
+    i<bytes.length;
+    i+=chunkSize
+  ){
+
+    binary += String.fromCharCode(
+      ...bytes.subarray(
+        i,
+        Math.min(
+          i+chunkSize,
+          bytes.length
+        )
+      )
+    );
+
+  }
+
+  return btoa(binary);
+
+}
+
+
+/* --------------------------------------------------
+   AI AUDIO ANALYSIS
+-------------------------------------------------- */
+
+async function analyzeAudio(){
+
+  if(
+    !audios.length ||
+    !totalDuration
+  ){
+
+    status(
+      "Please upload valid audio files first."
+    );
+
+    return;
+
+  }
+
+
+  $("analyzeBtn").disabled = true;
+
+  $("buildBtn").disabled = true;
+
+  setProgress(0);
+
+  status(
+    "Preparing voice-over analysis…"
+  );
+
+
+  try{
+
+    const segments = [];
+
+
+    /*
+      Analyze every audio clip separately.
+
+      This keeps the original clip order and
+      avoids trying to send a huge 20-minute
+      file in one request.
+    */
+
+    for(
+      let i=0;
+      i<audios.length;
+      i++
+    ){
+
+      const file =
+        audios[i];
+
+      status(
+        "Analyzing voice-over clip "
+        +
+        (i+1)
+        +
+        " of "
+        +
+        audios.length
+        +
+        "…"
+      );
+
+
+      const base64 =
+        await fileToBase64(file);
+
+
+      const prompt = `
+You are analyzing narration for a military-history YouTube video.
+
+Listen to the attached narration audio.
+
+Return ONLY valid JSON.
+
+Find the major visual/narration sections in this audio.
+
+For every section return:
+
+{
+  "sections": [
+    {
+      "start": number,
+      "end": number,
+      "topic": "short topic",
+      "visual_keywords": ["keyword1","keyword2","keyword3"],
+      "narration_summary": "short summary"
+    }
+  ]
+}
+
+Rules:
+
+1. start and end are seconds from the beginning of THIS audio clip.
+2. Use realistic timestamps.
+3. Do not invent sections that are not present.
+4. Keep sections large enough to be useful for a visual timeline.
+5. Prefer important visual changes in the narration.
+6. Return JSON only.
+`;
+
+
+      const body = {
+
+        contents:[
+          {
+            role:"user",
+
+            parts:[
+              {
+                inlineData:{
+                  mimeType:
+                    file.type ||
+                    "audio/mpeg",
+
+                  data:base64
+                }
+              },
+
+              {
+                text:prompt
+              }
+            ]
+          }
+        ],
+
+        generationConfig:{
+          temperature:0.1,
+
+          responseMimeType:
+            "application/json"
+        }
+
+      };
+
+
+      const result =
+        await callGemini(body);
+
+
+      const text =
+        extractGeminiText(result);
+
+
+      const parsed =
+        parseJSONFromText(text);
+
+
+      if(
+        parsed &&
+        Array.isArray(parsed.sections)
+      ){
+
+        const clipStart =
+          audioDurations
+            .slice(0,i)
+            .reduce(
+              (a,b)=>a+b,
+              0
+            );
+
+
+        for(
+          const section
+          of parsed.sections
+        ){
+
+          const start =
+            Number(section.start);
+
+          const end =
+            Number(section.end);
+
+
+          if(
+            !Number.isFinite(start) ||
+            !Number.isFinite(end) ||
+            end <= start
+          ){
+
+            continue;
+
+          }
+
+
+          segments.push({
+
+            start:
+              clipStart + start,
+
+            end:
+              clipStart +
+              Math.min(
+                end,
+                audioDurations[i] || end
+              ),
+
+            topic:
+              String(
+                section.topic || ""
+              ),
+
+            visual_keywords:
+              Array.isArray(
+                section.visual_keywords
+              )
+              ?
+              section.visual_keywords
+                .map(String)
+              : [],
+
+            narration_summary:
+              String(
+                section.narration_summary || ""
+              )
+
+          });
+
+        }
+
+      }
+
+
+      setProgress(
+        ((i+1)/audios.length)*100
+      );
+
+    }
+
+
+    if(!segments.length){
+
+      throw new Error(
+        "No useful narration sections were returned."
+      );
+
+    }
+
+
+    segments.sort(
+      (a,b)=>a.start-b.start
+    );
+
+
+    analysis = {
+
+      totalDuration,
+
+      sections:segments
+
     };
 
-    const recordingStopped = new Promise((resolve, reject) => {
-      exportRecorder.onstop = resolve;
-      exportRecorder.onerror = () => reject(new Error("Video recording failed."));
-    });
 
-    exportRecorder.start(1000);
-    const startedAt = performance.now();
-    let clipIndex = 0;
-    let clipAudio = null;
+    $("analysisInfo").textContent =
+      "AI found "
+      +
+      segments.length
+      +
+      " narration section(s).";
 
-    const audioFinished = new Promise((resolve, reject) => {
-      const nextClip = async () => {
-        if (clipAudio) {
-          clipAudio.onended = null;
-          clipAudio.onerror = null;
-        }
-        if (clipIndex >= audios.length) {
-          resolve();
-          return;
-        }
-        const file = audios[clipIndex++];
-        clipAudio = new Audio();
-        clipAudio.preload = "auto";
-        clipAudio.crossOrigin = "anonymous";
-        try {
-          const url = URL.createObjectURL(file);
-          clipAudio.src = url;
-          const source = audioContext.createMediaElementSource(clipAudio);
-          source.connect(destination);
-          source.connect(audioContext.destination);
-          clipAudio.onended = nextClip;
-          clipAudio.onerror = () => reject(new Error("An audio clip failed during export."));
-          await clipAudio.play();
-        } catch (e) {
-          reject(e);
-        }
-      };
-      nextClip();
-    });
 
-    while (performance.now() - startedAt < totalDuration * 1000 && !stopRequested) {
-      const elapsed = (performance.now() - startedAt) / 1000;
-      drawImageAt(elapsed);
-      status(`Exporting video… ${Math.min(100, Math.floor(elapsed / totalDuration * 100))}%`);
-      await sleep(33);
-    }
+    status(
+      "Voice-over analysis complete. Now build the AI timeline."
+    );
 
-    if (clipAudio) {
-      clipAudio.pause();
-      clipAudio.onended = null;
-    }
-    stopRequested = true;
-    try { await audioFinished; } catch (e) {
-      if (performance.now() - startedAt < totalDuration * 1000 - 500) throw e;
-    }
-    if (exportRecorder.state !== "inactive") exportRecorder.stop();
-    await recordingStopped;
 
-    const blob = new Blob(exportChunks, {type:"video/webm"});
-    if (!blob.size) throw new Error("The exported video is empty.");
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "ArmorLore-Video.webm";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
-    status(`Export complete. File size: ${(blob.size / (1024 * 1024)).toFixed(1)} MB. Check your Downloads folder.`);
-  } catch (err) {
-    if (exportRecorder && exportRecorder.state !== "inactive") {
-      try { exportRecorder.stop(); } catch (_) {}
-    }
-    status("Export failed: " + (err.message || "Unknown error") + "\nTry fewer files or use an updated Chrome browser.");
-  } finally {
-    if (canvasStream) canvasStream.getTracks().forEach(t => t.stop());
-    if (combinedStream) combinedStream.getTracks().forEach(t => t.stop());
-    if (audioContext) {
-      try { await audioContext.close(); } catch (_) {}
-      audioContext = null;
-    }
-    exportBusy = false;
-    $("exportBtn").disabled = !durations.length;
-    $("previewBtn").disabled = !durations.length;
-    drawImageAt(0);
+    updateButtonState();
+
+  }catch(error){
+
+    console.error(error);
+
+    status(
+      "AI analysis failed:\n"
+      +
+      (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+    $("analysisInfo").textContent =
+      "Analysis failed.";
+
+  }finally{
+
+    $("analyzeBtn").disabled =
+      !audios.length ||
+      totalDuration<=0;
+
   }
+
 }
 
-$("exportBtn").addEventListener("click", exportVideo);
+
+/* --------------------------------------------------
+   IMAGE MATCHING
+-------------------------------------------------- */
+
+function scoreImageForSection(
+  image,
+  section,
+  index
+){
+
+  /*
+    Local filename matching is used first.
+
+    Gemini narration keywords are used as
+    hints. The editor does NOT generate
+    new images.
+  */
+
+  const name =
+    image.file.name
+      .toLowerCase()
+      .replace(
+        /[_\-]+/g,
+        " "
+      );
+
+
+  const keywords =
+    [
+      ...(section.visual_keywords || []),
+      section.topic || ""
+    ]
+      .join(" ")
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
+
+
+  let score = 0;
+
+
+  for(
+    const keyword
+    of keywords
+  ){
+
+    if(
+      keyword.length >= 3 &&
+      name.includes(keyword)
+    ){
+
+      score += 10;
+
+    }
+
+  }
+
+
+  /*
+    Give a small preference to unused
+    images so the same image is not
+    repeatedly selected.
+  */
+
+  if(image.__used){
+
+    score -= 1000;
+
+  }
+
+
+  /*
+    Stable fallback ordering.
+  */
+
+  score -= index * 0.0001;
+
+
+  return score;
+
+}
+
+
+/* --------------------------------------------------
+   BUILD AI TIMELINE
+-------------------------------------------------- */
+
+function buildAITimeline(){
+
+  if(
+    !analysis ||
+    !analysis.sections.length ||
+    !images.length
+  ){
+
+    status(
+      "Analyze the voice-over and upload images first."
+    );
+
+    return;
+
+  }
+
+
+  stopPreview();
+
+  timelineItems = [];
+
+  images.forEach(
+    image => image.__used = false
+  );
+
+
+  const sections =
+    analysis.sections;
+
+
+  /*
+    Create timeline sections from
+    the narration analysis.
+  */
+
+  sections.forEach(
+    (section,sectionIndex) => {
+
+      const duration =
+        Math.max(
+          0.2,
+          section.end-section.start
+        );
+
+
+      let bestIndex = -1;
+
+      let bestScore = -Infinity;
+
+
+      images.forEach(
+        (image,index) => {
+
+          const score =
+            scoreImageForSection(
+              image,
+              section,
+              index
+            );
+
+
+          if(score > bestScore){
+
+            bestScore = score;
+
+            bestIndex = index;
+
+          }
+
+        }
+      );
+
+
+      /*
+        If all images have already been
+        used, allow the least-bad image
+        instead of crashing.
+
+        But only use repetition when
+        there are fewer images than
+        narration sections.
+      */
+
+      if(bestIndex < 0){
+
+        bestIndex =
+          sectionIndex %
+          images.length;
+
+      }
+
+
+      const image =
+        images[bestIndex];
+
+
+      image.__used = true;
+
+
+      timelineItems.push({
+
+        imageIndex:
+          bestIndex,
+
+        start:
+          section.start,
+
+        end:
+          section.end,
+
+        duration,
+
+        topic:
+          section.topic,
+
+        summary:
+          section.narration_summary,
+
+        keywords:
+          section.visual_keywords || []
+
+      });
+
+    }
+
+  );
+
+
+  /*
+    Remove overlapping/invalid sections.
+  */
+
+  timelineItems =
+    timelineItems
+      .filter(
+        item =>
+          Number.isFinite(item.start) &&
+          Number.isFinite(item.end) &&
+          item.end > item.start
+      )
+      .sort(
+        (a,b)=>a.start-b.start
+      );
+
+
+  /*
+    If AI sections don't cover the complete
+    narration, fill the missing time with
+    unused original images.
+  */
+
+  const covered = [];
+
+
+  timelineItems.forEach(
+    item => {
+
+      covered.push([
+        item.start,
+        item.end
+      ]);
+
+    }
+  );
+
+
+  let cursor = 0;
+
+
+  const additions = [];
+
+
+  for(
+    const item
+    of timelineItems
+  ){
+
+    if(
+      item.start > cursor + 0.15
+    ){
+
+      const gap =
+        item.start-cursor;
+
+
+      const unused =
+        images.findIndex(
+          image =>
+            !image.__used
+        );
+
+
+      if(unused >= 0){
+
+        images[unused].__used = true;
+
+        additions.push({
+
+          imageIndex:unused,
+
+          start:cursor,
+
+          end:item.start,
+
+          duration:gap,
+
+          topic:"Narration transition",
+
+          summary:"",
+
+          keywords:[]
+
+        });
+
+      }
+
+    }
+
+
+    cursor =
+      Math.max(
+        cursor,
+        item.end
+      );
+
+  }
+
+
+  if(
+    cursor < totalDuration-0.15
+  ){
+
+    const unused =
+      images.findIndex(
+        image =>
+          !image.__used
+      );
+
+
+    if(unused >= 0){
+
+      images[unused].__used = true;
+
+      additions.push({
+
+        imageIndex:unused,
+
+        start:cursor,
+
+        end:totalDuration,
+
+        duration:
+          totalDuration-cursor,
+
+        topic:"Ending section",
+
+        summary:"",
+
+        keywords:[]
+
+      });
+
+    }
+
+  }
+
+
+  timelineItems =
+    [
+      ...timelineItems,
+      ...additions
+    ]
+      .sort(
+        (a,b)=>a.start-b.start
+      );
+
+
+  /*
+    Make sure timeline does not exceed
+    the narration duration.
+  */
+
+  timelineItems =
+    timelineItems.map(
+      item => {
+
+        const start =
+          Math.max(
+            0,
+            Math.min(
+              totalDuration,
+              item.start
+            )
+          );
+
+        const end =
+          Math.max(
+            start+0.05,
+            Math.min(
+              totalDuration,
+              item.end
+            )
+          );
+
+        return {
+
+          ...item,
+
+          start,
+
+          end,
+
+          duration:
+            end-start
+
+        };
+
+      }
+    );
+
+
+  renderTimeline();
+
+  drawImageAt(0);
+
+
+  $("timeInfo").textContent =
+    "Narration: "
+    +
+    formatTime(totalDuration)
+    +
+    " • AI sections: "
+    +
+    timelineItems.length;
+
+
+  $("previewBtn").disabled = false;
+
+  $("exportBtn").disabled = false;
+
+
+  status(
+    "AI timeline built. Review the image order before exporting."
+  );
+
+}
+
+
+/* --------------------------------------------------
+   RENDER TIMELINE
+-------------------------------------------------- */
+
+function renderTimeline(){
+
+  const container =
+    $("timeline");
+
+  container.replaceChildren();
+
+
+  timelineItems.forEach(
+    (item,index) => {
+
+      const image =
+        images[item.imageIndex];
+
+
+      if(!image) return;
+
+
+      const tile =
+        document.createElement("div");
+
+      tile.className =
+        "tile";
+
+
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "tile-row";
+
+
+      const img =
+        document.createElement("img");
+
+      img.src =
+        image.url;
+
+      img.alt =
+        "Original image "
+        +
+        (item.imageIndex+1);
+
+
+      row.appendChild(img);
+
+
+      const info =
+        document.createElement("div");
+
+      info.className =
+        "tile-info";
+
+
+      const title =
+        document.createElement("div");
+
+      title.className =
+        "tile-title";
+
+      title.textContent =
+        "Section "
+        +
+        (index+1)
+        +
+        " • "
+        +
+        (
+          item.topic ||
+          "Narration section"
+        );
+
+
+      info.appendChild(title);
+
+
+      const badge =
+        document.createElement("span");
+
+      badge.className =
+        "badge";
+
+      badge.textContent =
+        formatTime(item.start)
+        +
+        " → "
+        +
+        formatTime(item.end);
+
+
+      info.appendChild(badge);
+
+
+      const imageBadge =
+        document.createElement("span");
+
+      imageBadge.className =
+        "badge";
+
+      imageBadge.textContent =
+        "Image "
+        +
+        (item.imageIndex+1);
+
+
+      info.appendChild(
+        imageBadge
+      );
+
+
+      if(item.summary){
+
+        const summary =
+          document.createElement("div");
+
+        summary.className =
+          "tile-text";
+
+        summary.textContent =
+          item.summary;
+
+        info.appendChild(
+          summary
+        );
+
+      }
+
+
+      if(
+        item.keywords &&
+        item.keywords.length
+      ){
+
+        const keywords =
+          document.createElement("div");
+
+        keywords.className =
+          "tile-text";
+
+        keywords.textContent =
+          "Visual hints: "
+          +
+          item.keywords.join(", ");
+
+        info.appendChild(
+          keywords
+        );
+
+      }
+
+
+      const label =
+        document.createElement("label");
+
+      label.className =
+        "small";
+
+      label.textContent =
+        "Duration (seconds)";
+
+
+      const input =
+        document.createElement("input");
+
+      input.type =
+        "number";
+
+      input.min =
+        "0.1";
+
+      input.step =
+        "0.1";
+
+      input.value =
+        item.duration.toFixed(1);
+
+
+      input.addEventListener(
+        "change",
+        () => {
+
+          const value =
+            Number(input.value);
+
+
+          if(
+            !Number.isFinite(value) ||
+            value <= 0
+          ){
+
+            input.value =
+              item.duration.toFixed(1);
+
+            return;
+
+          }
+
+
+          item.duration =
+            value;
+
+          item.end =
+            item.start +
+            value;
+
+
+          updateTimeInfo();
+
+          drawImageAt(0);
+
+        }
+      );
+
+
+      info.appendChild(label);
+
+      info.appendChild(input);
+
+
+      row.appendChild(info);
+
+      tile.appendChild(row);
+
+      container.appendChild(tile);
+
+    }
+
+  );
+
+}
+
+
+/* --------------------------------------------------
+   TIME INFO
+-------------------------------------------------- */
+
+function updateTimeInfo(){
+
+  const sum =
+    timelineItems.reduce(
+      (a,b)=>a+b.duration,
+      0
+    );
+
+
+  $("timeInfo").textContent =
+    "Timeline: "
+    +
+    sum.toFixed(1)
+    +
+    " sec • Narration: "
+    +
+    formatTime(totalDuration)
+    +
+    (
+      Math.abs(
+        sum-totalDuration
+      ) > 0.5
+      ?
+      " • Duration mismatch"
+      :
+      ""
+    );
+
+}
+
+
+/* --------------------------------------------------
+   DRAW IMAGE
+-------------------------------------------------- */
+
+function drawImageAt(time){
+
+  ctx.fillStyle =
+    "#050505";
+
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+
+  if(!timelineItems.length){
+
+    return;
+
+  }
+
+
+  let item =
+    timelineItems[
+      timelineItems.length-1
+    ];
+
+
+  for(
+    const candidate
+    of timelineItems
+  ){
+
+    if(
+      time >= candidate.start &&
+      time < candidate.end
+    ){
+
+      item =
+        candidate;
+
+      break;
+
+    }
+
+  }
+
+
+  const image =
+    images[item.imageIndex];
+
+
+  const img =
+    image?.img;
+
+
+  if(
+    !img ||
+    !img.naturalWidth
+  ){
+
+    return;
+
+  }
+
+
+  const scale =
+    Math.min(
+      canvas.width/img.naturalWidth,
+      canvas.height/img.naturalHeight
+    );
+
+
+  const w =
+    img.naturalWidth*scale;
+
+  const h =
+    img.naturalHeight*scale;
+
+
+  /*
+    Small automatic zoom.
+
+    The original image itself is
+    never changed.
+  */
+
+  const local =
+    Math.max(
+      0,
+      Math.min(
+        1,
+        (
+          time-item.start
+        ) /
+        Math.max(
+          0.01,
+          item.duration
+        )
+      )
+    );
+
+
+  const zoom =
+    1 +
+    0.04*local;
+
+
+  const drawW =
+    w*zoom;
+
+  const drawH =
+    h*zoom;
+
+
+  ctx.drawImage(
+    img,
+    (canvas.width-drawW)/2,
+    (canvas.height-drawH)/2,
+    drawW,
+    drawH
+  );
+
+}
+
+
+/* --------------------------------------------------
+   BUILD BUTTON
+-------------------------------------------------- */
+
+$("buildBtn").addEventListener(
+  "click",
+  buildAITimeline
+);
+
+
+/* --------------------------------------------------
+   PREVIEW AUDIO
+-------------------------------------------------- */
+
+function playAudioSequence(){
+
+  return new Promise(
+    (resolve,reject) => {
+
+      let index = 0;
+
+
+      const playNext =
+        () => {
+
+          if(
+            stopRequested ||
+            index>=audios.length
+          ){
+
+            resolve();
+
+            return;
+
+          }
+
+
+          const file =
+            audios[index++];
+
+
+          const audio =
+            new Audio();
+
+
+          activeAudio =
+            audio;
+
+
+          audio.preload =
+            "auto";
+
+
+          audio.onended =
+            playNext;
+
+
+          audio.onerror =
+            () =>
+              reject(
+                new Error(
+                  "An audio file could not be played."
+                )
+              );
+
+
+          audio.src =
+            URL.createObjectURL(file);
+
+
+          audio.play()
+            .catch(reject);
+
+        };
+
+
+      playNext();
+
+    }
+  );
+
+}
+
+
+/* --------------------------------------------------
+   PREVIEW
+-------------------------------------------------- */
+
+async function startPreview(){
+
+  if(
+    !audios.length ||
+    !timelineItems.length
+  ){
+
+    return;
+
+  }
+
+
+  stopPreview();
+
+  stopRequested =
+    false;
+
+  previewing =
+    true;
+
+  previewStart =
+    performance.now();
+
+
+  $("previewBtn").disabled =
+    true;
+
+  $("stopBtn").disabled =
+    false;
+
+
+  status(
+    "Preview playing…"
+  );
+
+
+  function frame(now){
+
+    if(!previewing){
+
+      return;
+
+    }
+
+
+    const elapsed =
+      (
+        now-previewStart
+      )/1000;
+
+
+    drawImageAt(elapsed);
+
+
+    if(
+      elapsed>=totalDuration
+    ){
+
+      stopPreview();
+
+      status(
+        "Preview finished."
+      );
+
+      return;
+
+    }
+
+
+    previewRAF =
+      requestAnimationFrame(
+        frame
+      );
+
+  }
+
+
+  previewRAF =
+    requestAnimationFrame(
+      frame
+    );
+
+
+  try{
+
+    await playAudioSequence();
+
+
+    if(previewing){
+
+      stopPreview();
+
+      status(
+        "Preview finished."
+      );
+
+    }
+
+  }catch(error){
+
+    stopPreview();
+
+    status(
+      "Audio playback error: "
+      +
+      error.message
+    );
+
+  }
+
+}
+
+
+$("previewBtn").addEventListener(
+  "click",
+  startPreview
+);
+
+
+$("stopBtn").addEventListener(
+  "click",
+  () => {
+
+    stopRequested =
+      true;
+
+    stopPreview();
+
+    status(
+      "Preview stopped."
+    );
+
+  }
+);
+
+
+/* --------------------------------------------------
+   EXPORT
+-------------------------------------------------- */
+
+async function exportVideo(){
+
+  if(
+    exportBusy ||
+    !audios.length ||
+    !timelineItems.length
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    !("MediaRecorder" in window) ||
+    !canvas.captureStream
+  ){
+
+    status(
+      "This Chrome browser does not support canvas video recording."
+    );
+
+    return;
+
+  }
+
+
+  exportBusy =
+    true;
+
+  stopPreview();
+
+  stopRequested =
+    false;
+
+
+  $("exportBtn").disabled =
+    true;
+
+  $("previewBtn").disabled =
+    true;
+
+
+  status(
+    "Preparing video export…"
+  );
+
+
+  let canvasStream = null;
+
+  let combinedStream = null;
+
+  let destination = null;
+
+  let recorder = null;
+
+  let chunks = [];
+
+
+  try{
+
+    audioContext =
+      new (
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
+
+
+    await audioContext.resume();
+
+
+    destination =
+      audioContext
+        .createMediaStreamDestination();
+
+
+    canvasStream =
+      canvas.captureStream(30);
+
+
+    combinedStream =
+      new MediaStream([
+        ...canvasStream.getVideoTracks(),
+        ...destination.stream.getAudioTracks()
+      ]);
+
+
+    const mime =
+      MediaRecorder.isTypeSupported(
+        "video/webm;codecs=vp9,opus"
+      )
+      ?
+      "video/webm;codecs=vp9,opus"
+      :
+      "video/webm";
+
+
+    recorder =
+      new MediaRecorder(
+        combinedStream,
+        {
+          mimeType:mime
+        }
+      );
+
+
+    recorder.ondataavailable =
+      event => {
+
+        if(
+          event.data &&
+          event.data.size
+        ){
+
+          chunks.push(
+            event.data
+          );
+
+        }
+
+      };
+
+
+    const stopped =
+      new Promise(
+        (resolve,reject) => {
+
+          recorder.onstop =
+            resolve;
+
+          recorder.onerror =
+            () =>
+              reject(
+                new Error(
+                  "Video recorder failed."
+                )
+              );
+
+        }
+      );
+
+
+    recorder.start(1000);
+
+
+    const started =
+      performance.now();
+
+
+    let clipIndex = 0;
+
+    let clipAudio = null;
+
+
+    const audioFinished =
+      new Promise(
+        (resolve,reject) => {
+
+          const next =
+            async () => {
+
+              if(
+                clipAudio
+              ){
+
+                clipAudio.onended =
+                  null;
+
+                clipAudio.onerror =
+                  null;
+
+              }
+
+
+              if(
+                clipIndex>=audios.length
+              ){
+
+                resolve();
+
+                return;
+
+              }
+
+
+              const file =
+                audios[clipIndex++];
+
+
+              clipAudio =
+                new Audio();
+
+
+              clipAudio.preload =
+                "auto";
+
+
+              const url =
+                URL.createObjectURL(file);
+
+
+              clipAudio.src =
+                url;
+
+
+              try{
+
+                const source =
+                  audioContext
+                    .createMediaElementSource(
+                      clipAudio
+                    );
+
+
+                source.connect(
+                  destination
+                );
+
+
+                source.connect(
+                  audioContext.destination
+                );
+
+
+                clipAudio.onended =
+                  next;
+
+
+                clipAudio.onerror =
+                  () =>
+                    reject(
+                      new Error(
+                        "Audio clip failed during export."
+                      )
+                    );
+
+
+                await clipAudio.play();
+
+              }catch(error){
+
+                reject(error);
+
+              }
+
+            };
+
+
+          next();
+
+        }
+      );
+
+
+    while(
+      performance.now()-started
+      <
+      totalDuration*1000
+      &&
+      !stopRequested
+    ){
+
+      const elapsed =
+        (
+          performance.now()-started
+        )/1000;
+
+
+      drawImageAt(elapsed);
+
+
+      const percent =
+        Math.min(
+          100,
+          (
+            elapsed/
+            totalDuration
+          )*100
+        );
+
+
+      status(
+        "Exporting video… "
+        +
+        Math.floor(percent)
+        +
+        "%"
+      );
+
+
+      await sleep(33);
+
+    }
+
+
+    if(clipAudio){
+
+      clipAudio.pause();
+
+      clipAudio.onended =
+        null;
+
+    }
+
+
+    try{
+
+      await audioFinished;
+
+    }catch(error){
+
+      /*
+        If the video duration has already
+        finished, don't fail the whole export.
+      */
+
+      if(
+        performance.now()-started
+        <
+        totalDuration*1000-500
+      ){
+
+        throw error;
+
+      }
+
+    }
+
+
+    if(
+      recorder.state !==
+      "inactive"
+    ){
+
+      recorder.stop();
+
+    }
+
+
+    await stopped;
+
+
+    const blob =
+      new Blob(
+        chunks,
+        {
+          type:"video/webm"
+        }
+      );
+
+
+    if(!blob.size){
+
+      throw new Error(
+        "The exported video is empty."
+      );
+
+    }
+
+
+    const url =
+      URL.createObjectURL(blob);
+
+
+    const link =
+      document.createElement("a");
+
+
+    link.href =
+      url;
+
+
+    link.download =
+      "ArmorLore-AI-Video.webm";
+
+
+    document.body.appendChild(
+      link
+    );
+
+
+    link.click();
+
+    link.remove();
+
+
+    setTimeout(
+      () =>
+        URL.revokeObjectURL(url),
+      60000
+    );
+
+
+    status(
+      "Export complete.\n"
+      +
+      "File size: "
+      +
+      (
+        blob.size/
+        (1024*1024)
+      ).toFixed(1)
+      +
+      " MB\n"
+      +
+      "Check your Downloads folder."
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+
+    try{
+
+      if(
+        recorder &&
+        recorder.state !==
+        "inactive"
+      ){
+
+        recorder.stop();
+
+      }
+
+    }catch(_){}
+
+
+    status(
+      "Export failed:\n"
+      +
+      (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+
+  }finally{
+
+    if(canvasStream){
+
+      canvasStream
+        .getTracks()
+        .forEach(
+          track =>
+            track.stop()
+        );
+
+    }
+
+
+    if(combinedStream){
+
+      combinedStream
+        .getTracks()
+        .forEach(
+          track =>
+            track.stop()
+        );
+
+    }
+
+
+    if(audioContext){
+
+      try{
+
+        await audioContext.close();
+
+      }catch(_){}
+
+      audioContext =
+        null;
+
+    }
+
+
+    exportBusy =
+      false;
+
+
+    $("exportBtn").disabled =
+      !timelineItems.length;
+
+
+    $("previewBtn").disabled =
+      !timelineItems.length;
+
+
+    drawImageAt(0);
+
+  }
+
+}
+
+
+$("exportBtn").addEventListener(
+  "click",
+  exportVideo
+);
+
+
+/* --------------------------------------------------
+   AI ANALYSIS BUTTON
+-------------------------------------------------- */
+
+$("analyzeBtn").addEventListener(
+  "click",
+  analyzeAudio
+);
+
+
+/* --------------------------------------------------
+   INITIAL STATE
+-------------------------------------------------- */
+
 drawImageAt(0);
+
+updateButtonState();
+
 </script>
+
 </body>
 </html>
