@@ -697,6 +697,66 @@ function updateButtonState(){
 
 async function callGemini(body){
 
+  const response = await fetch(
+    BACKEND_URL + "/api/gemini",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(body)
+    }
+  );
+
+  const text = await response.text();
+
+  let data = null;
+
+  try{
+    data = JSON.parse(text);
+  }catch(_){
+    data = null;
+  }
+
+  if(!response.ok){
+
+    let message =
+      "HTTP " +
+      response.status;
+
+    if(data && data.error){
+
+      if(typeof data.error === "string"){
+        message += ": " + data.error;
+      }
+
+      else if(data.error.message){
+        message += ": " + data.error.message;
+      }
+
+      else{
+        message += ": " +
+          JSON.stringify(data.error);
+      }
+
+    }else if(text){
+
+      message += ": " + text;
+    }
+
+    throw new Error(message);
+  }
+
+  if(!data){
+
+    throw new Error(
+      "Backend returned invalid JSON."
+    );
+
+  }
+
+  return data;
+}
   const response =
     await fetch(
       BACKEND_URL + "/api/gemini",
